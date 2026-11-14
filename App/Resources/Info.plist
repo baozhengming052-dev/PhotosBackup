@@ -10,7 +10,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>Photos Backup</string>
+	<string>照片备份</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -28,9 +28,9 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Only used if you choose Location for Keep Running in Background. The location itself is ignored; receiving it is what lets iOS keep the backup running while the app is closed.</string>
+	<string>只有选择定位方式保持后台运行时才会使用。应用不会读取或保存您的具体位置，只利用系统定位更新维持后台备份。</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Photos Backup needs access to the albums and photos you choose so it can safely back them up to Google Photos.</string>
+	<string>照片备份需要访问您选择的相簿和照片，以便将它们备份到 Google 相册。</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

@@ -93,7 +93,7 @@ struct SafariTutorialCard: View {
                     .font(.caption.weight(.semibold))
                 HStack(spacing: 5) {
                     Image(systemName: "lock.fill").font(.system(size: 8))
-                    Text(scene == .enableExtension ? "Safari Extensions" : "accounts.google.com")
+                    Text(scene == .enableExtension ? "Safari 扩展" : "accounts.google.com")
                         .font(.caption2)
                         .lineLimit(1)
                 }
@@ -144,13 +144,13 @@ struct SafariTutorialCard: View {
     private var signInScene: some View {
         VStack(spacing: 16) {
             Text("G").font(.system(size: 34, weight: .medium)).foregroundStyle(BackupTheme.blue)
-            Text("Sign in").font(.title3.weight(.semibold))
-            Text("Use your Google Account").font(.subheadline).foregroundStyle(.secondary)
+            Text("登录").font(.title3.weight(.semibold))
+            Text("使用您的 Google 账号").font(.subheadline).foregroundStyle(.secondary)
             RoundedRectangle(cornerRadius: 8).stroke(Color.secondary.opacity(0.35))
                 .frame(height: 44)
-                .overlay(Text("Email or phone").font(.subheadline).foregroundStyle(.secondary), alignment: .leading)
+                .overlay(Text("邮箱或电话号码").font(.subheadline).foregroundStyle(.secondary), alignment: .leading)
                 .padding(.horizontal, 30)
-            Text("Next")
+            Text("下一步")
                 .font(.subheadline.weight(.semibold)).foregroundStyle(.white)
                 .padding(.horizontal, 24).padding(.vertical, 9)
                 .background(BackupTheme.blue, in: RoundedRectangle(cornerRadius: 7))
@@ -160,15 +160,15 @@ struct SafariTutorialCard: View {
 
     private var extensionScene: some View {
         VStack(spacing: 10) {
-            Text("Extensions").font(.headline)
-            Text("Allow extensions to customize Safari.").font(.caption).foregroundStyle(.secondary)
+            Text("扩展").font(.headline)
+            Text("允许扩展自定义 Safari。").font(.caption).foregroundStyle(.secondary)
             HStack(spacing: 12) {
                 FeatureIcon(symbol: "photo.stack.fill", size: 38)
                 VStack(alignment: .leading, spacing: 3) {
-                    Text("Photos Backup Connect")
+                    Text("照片备份连接")
                         .font(.caption.weight(.semibold))
                         .fixedSize(horizontal: false, vertical: true)
-                    Text("Website access allowed")
+                    Text("已允许访问网站")
                         .font(.caption2)
                         .foregroundStyle(.secondary)
                         .lineLimit(2)
@@ -180,7 +180,7 @@ struct SafariTutorialCard: View {
             .padding(14)
             .background(Color(uiColor: .secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 12))
             .padding(.horizontal, 20)
-            Text("Turn on the extension, then return to Safari.")
+            Text("开启扩展，然后返回 Safari。")
                 .font(.caption).foregroundStyle(.secondary)
         }
         .padding(.vertical, 28)
@@ -191,17 +191,17 @@ struct SafariTutorialCard: View {
             HStack {
                 FeatureIcon(symbol: "photo.stack.fill", size: 38)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Photos Backup").font(.subheadline.weight(.semibold))
-                    Text("Safari Extension").font(.caption).foregroundStyle(.secondary)
+                    Text("照片备份").font(.subheadline.weight(.semibold))
+                    Text("Safari 扩展").font(.caption).foregroundStyle(.secondary)
                 }
                 Spacer()
                 Image(systemName: "xmark.circle.fill").foregroundStyle(.tertiary)
             }
-            Text("Ready to connect")
+            Text("准备连接")
                 .font(.title3.weight(.semibold))
-            Text("We’ll securely send your sign-in to the Photos Backup app.")
+            Text("我们会安全地将登录信息发送给照片备份应用。")
                 .font(.caption).foregroundStyle(.secondary).multilineTextAlignment(.center)
-            Label("Connect account", systemImage: "link")
+            Label("连接账号", systemImage: "link")
                 .font(.subheadline.weight(.semibold)).foregroundStyle(.white)
                 .frame(maxWidth: .infinity).padding(.vertical, 11)
                 .background(BackupTheme.blue, in: RoundedRectangle(cornerRadius: 10))
@@ -212,10 +212,10 @@ struct SafariTutorialCard: View {
 
 struct SafariConnectionGuide: View {
     private let steps: [(String, String, String)] = [
-        ("1", "Sign in and tap I agree", "Complete Google’s sign-in page."),
-        ("2", "Open Safari’s extension menu", "Tap the puzzle-piece or page menu icon."),
-        ("3", "Choose Photos Backup Connect", "Open our extension from the list."),
-        ("4", "Tap Connect to App", "Wait for the green confirmation, then return.")
+        ("1", "登录并点击“我同意”", "完成 Google 登录页面。"),
+        ("2", "打开 Safari 扩展菜单", "点击拼图图标或网页菜单图标。"),
+        ("3", "选择“照片备份连接”", "在列表中打开照片备份扩展。"),
+        ("4", "点击“连接到应用”", "等待出现绿色确认提示，然后返回。")
     ]
 
     var body: some View {

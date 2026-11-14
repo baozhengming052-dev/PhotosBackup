@@ -9,15 +9,15 @@ enum BackupConnection: String, CaseIterable, Identifiable {
 
     var title: String {
         switch self {
-        case .wifiOnly: return "Wi-Fi Only"
-        case .wifiAndCellular: return "Wi-Fi & Cellular"
+        case .wifiOnly: return "仅 Wi-Fi"
+        case .wifiAndCellular: return "Wi-Fi 和蜂窝网络"
         }
     }
 
     var detail: String {
         switch self {
-        case .wifiOnly: return "Wait for Wi-Fi before uploading"
-        case .wifiAndCellular: return "Back up wherever you are"
+        case .wifiOnly: return "连接 Wi-Fi 后才开始上传"
+        case .wifiAndCellular: return "随时随地备份"
         }
     }
 }
@@ -95,7 +95,7 @@ struct PhotoAlbum: Identifiable, Equatable {
     let title: String
     let count: Int
     let symbol: String
-    /// `nil` for the synthetic "All Photos" album, which spans the whole
+    /// `nil` for the synthetic "所有照片" album, which spans the whole
     /// library rather than a single collection.
     let collection: PHAssetCollection?
 
@@ -118,7 +118,7 @@ final class PhotoAlbumStore: ObservableObject {
     private var countsTask: Task<Void, Never>?
     private var lastCountsRefreshStartedAt = Date.distantPast
     /// Shortest gap between two backed-up recounts. One recount enumerates every
-    /// asset in every selected album — the whole library when "All Photos" is
+    /// asset in every selected album — the whole library when "所有照片" is
     /// selected — and the trigger is the completion ledger, which moves once per
     /// uploaded photo. Without a floor a long backup keeps a full-library
     /// PhotoKit scan running end to end, competing with the uploads themselves.
@@ -171,7 +171,7 @@ final class PhotoAlbumStore: ObservableObject {
             guard fetch.count > 0 else { return }
             result.append(PhotoAlbum(
                 id: collection.localIdentifier,
-                title: collection.localizedTitle ?? "Untitled Album",
+                title: collection.localizedTitle ?? "未命名相簿",
                 count: fetch.count,
                 symbol: symbol(for: collection),
                 collection: collection
@@ -194,7 +194,7 @@ final class PhotoAlbumStore: ObservableObject {
         if allCount > 0 {
             ordered.insert(PhotoAlbum(
                 id: PhotoAlbum.allPhotosID,
-                title: "All Photos",
+                title: "所有照片",
                 count: allCount,
                 symbol: "photo.on.rectangle.angled",
                 collection: nil
@@ -223,7 +223,7 @@ final class PhotoAlbumStore: ObservableObject {
     }
 
     func sources(for albumIDs: Set<String>) async -> [MediaSource] {
-        // Albums overlap (and "All Photos" contains all of them), so dedup by
+        // Albums overlap (and "所有照片" contains all of them), so dedup by
         // asset identifier — otherwise one asset becomes several queue sources.
         let byAlbum = await assetIdentifiers(for: albumIDs)
         var seen = Set<String>()
@@ -256,7 +256,7 @@ final class PhotoAlbumStore: ObservableObject {
         return sources
     }
 
-    /// Recompute "N of M backed up" for the selected albums. `isBackedUp` is
+    /// Recompute "已备份 N / M 项" for the selected albums. `isBackedUp` is
     /// resolved against the queue's durable completion ledger.
     func refreshBackedUpCounts(for albumIDs: Set<String>,
                                isBackedUp: @escaping @Sendable (String) -> Bool) {
@@ -315,7 +315,7 @@ final class PhotoAlbumStore: ObservableObject {
     }
 
     /// Images and videos across the whole library, newest first, for the
-    /// synthetic "All Photos" album.
+    /// synthetic "所有照片" album.
     nonisolated static func allPhotosOptions() -> PHFetchOptions {
         let options = PHFetchOptions()
         options.predicate = NSPredicate(

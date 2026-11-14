@@ -27,18 +27,18 @@ struct AccountConnectView: View {
                 }
                 if loading {
                     Color(.systemBackground).opacity(0.001) // keep taps flowing to the web view
-                    ProgressView("Loading Google sign-in…")
+                    ProgressView("正在加载 Google 登录…")
                         .controlSize(.large)
                         .padding(20)
                         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
                 }
             }
             .ignoresSafeArea(.container, edges: .bottom)
-            .navigationTitle("Connect Google Account")
+            .navigationTitle("连接 Google 账号")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { onCancel() }
+                    Button("取消") { onCancel() }
                 }
             }
         }

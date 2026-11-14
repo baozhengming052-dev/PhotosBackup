@@ -29,18 +29,18 @@ struct UploadsView: View {
                 }
             }
             .listStyle(.insetGrouped)
-            .navigationTitle("Activity")
+            .navigationTitle("备份记录")
             .sheet(isPresented: $showPicker) {
                 PhotoPicker { sources in enqueue(sources) }.ignoresSafeArea()
             }
             .sheet(item: $inspectedFailure) { failure in failureSheet(failure) }
             .confirmationDialog(
-                "Stop all backups?",
+                "停止所有备份吗？",
                 isPresented: $showingStopBackupConfirmation,
                 titleVisibility: .visible
             ) {
-                Button("Stop Backup", role: .destructive) { stopBackup() }
-                Button("Keep Backing Up", role: .cancel) {}
+                Button("停止备份", role: .destructive) { stopBackup() }
+                Button("继续备份", role: .cancel) {}
             } message: {
                 Text(stopBackupMessage)
             }
@@ -63,8 +63,8 @@ struct UploadsView: View {
                 HStack(spacing: 12) {
                     FeatureIcon(symbol: "photo.badge.plus", size: 42)
                     VStack(alignment: .leading, spacing: 3) {
-                        Text("Choose Photos or Videos").font(.headline).foregroundStyle(.primary)
-                        Text("Back up to 50 items at once").font(.caption).foregroundStyle(.secondary)
+                        Text("选择照片或视频").font(.headline).foregroundStyle(.primary)
+                        Text("每次最多备份 50 项").font(.caption).foregroundStyle(.secondary)
                     }
                 }
                 .padding(.vertical, 4)
@@ -72,7 +72,7 @@ struct UploadsView: View {
             .buttonStyle(.plain)
             .disabled(!account.status.isUsable)
         } footer: {
-            if !account.status.isUsable { Text("Connect a Google Photos account before starting a backup.") }
+            if !account.status.isUsable { Text("开始备份前，请先连接 Google 相册账号。") }
         }
     }
 
@@ -81,29 +81,29 @@ struct UploadsView: View {
             Label("Backup Paused", systemImage: "pause.circle.fill").foregroundStyle(.orange)
             Text(reason).font(.footnote).foregroundStyle(.secondary)
             if queue.haltReason != nil {
-                Button("Resume Backup") { queue.resume() }.disabled(!account.status.isUsable)
+                Button("继续备份") { queue.resume() }.disabled(!account.status.isUsable)
             } else if queue.isUserPaused {
-                Button("Resume Backup") { queue.resumeUserPausedUploads() }
+                Button("继续备份") { queue.resumeUserPausedUploads() }
                     .disabled(!account.status.isUsable)
             }
         }
     }
 
     private var queueManagementSection: some View {
-        Section("Queue Controls") {
+        Section("任务队列管理") {
             if queue.activeCount > 0 || queue.isUserPaused {
                 if queue.isUserPaused {
                     Button {
                         queue.resumeUserPausedUploads()
                     } label: {
-                        Label("Resume Backup", systemImage: "play.circle")
+                        Label("继续备份", systemImage: "play.circle")
                     }
                     .disabled(!account.status.isUsable)
                 } else if queue.pauseReason == nil {
                     Button {
                         queue.pauseAfterCurrentUploads()
                     } label: {
-                        Label("Pause After Current Uploads", systemImage: "pause.circle")
+                        Label("当前上传完成后暂停", systemImage: "pause.circle")
                     }
                 }
 
@@ -111,7 +111,7 @@ struct UploadsView: View {
                     Button(role: .destructive) {
                         showingStopBackupConfirmation = true
                     } label: {
-                        Label("Stop Backup", systemImage: "stop.circle")
+                        Label("停止备份", systemImage: "stop.circle")
                     }
                 }
             }
@@ -120,7 +120,7 @@ struct UploadsView: View {
                 Button {
                     queue.retryAllFailed()
                 } label: {
-                    Label("Retry Failed Uploads", systemImage: "arrow.clockwise.circle")
+                    Label("重试失败的上传", systemImage: "arrow.clockwise.circle")
                 }
             }
 
@@ -128,7 +128,7 @@ struct UploadsView: View {
                 Button {
                     queue.clearFinished()
                 } label: {
-                    Label("Clear Finished Uploads", systemImage: "checkmark.circle")
+                    Label("清除已完成记录", systemImage: "checkmark.circle")
                 }
             }
         }
@@ -136,7 +136,7 @@ struct UploadsView: View {
 
     private func persistenceWarningSection(_ warning: String) -> some View {
         Section {
-            Label("Upload Progress Isn’t Saved", systemImage: "externaldrive.badge.exclamationmark")
+            Label("上传进度未能保存", systemImage: "externaldrive.badge.exclamationmark")
                 .foregroundStyle(.orange)
             Text(warning).font(.footnote).foregroundStyle(.secondary)
         }
@@ -144,7 +144,7 @@ struct UploadsView: View {
 
     private var emptySection: some View {
         Section {
-            EmptyState(symbol: "tray", title: "No backup activity", message: "Photos you back up manually or from selected albums will appear here.")
+            EmptyState(symbol: "tray", title: "暂无备份记录", message: "手动备份或所选相簿的备份记录将显示在这里。")
                 .listRowBackground(Color.clear)
         }
     }
@@ -154,7 +154,7 @@ struct UploadsView: View {
             if !queue.isIdle {
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
-                        Text("Overall Progress").font(.subheadline.weight(.semibold))
+                        Text("总体进度").font(.subheadline.weight(.semibold))
                         Spacer()
                         Text(queue.overallFraction, format: .percent.precision(.fractionLength(0)))
                             .font(.caption.monospacedDigit()).foregroundStyle(.secondary)
@@ -166,7 +166,7 @@ struct UploadsView: View {
             ForEach(listed.items) { item in activityRow(item) }
         } header: {
             HStack {
-                Text("Uploads")
+                Text("上传任务")
                 Spacer()
                 if !queue.isIdle { Text("\(queue.activeCount) remaining") }
             }
@@ -186,9 +186,9 @@ struct UploadsView: View {
 
     private var stopBackupMessage: String {
         if preferences.automaticBackup {
-            return "Uploads in progress will be cancelled, the queue will be cleared, and Automatic Backup will be turned off. Photos already backed up are not affected."
+            return "将取消正在进行的上传、清空队列并关闭自动备份；已备份的照片不受影响。"
         }
-        return "Uploads in progress will be cancelled and the queue will be cleared. Photos already backed up are not affected."
+        return "将取消正在进行的上传并清空队列；已备份的照片不受影响。"
     }
 
     private func stopBackup() {
@@ -212,7 +212,7 @@ struct UploadsView: View {
                 if case .failed = item.state {
                     // The reason above is clamped to two lines, and Google's
                     // own explanation is usually past the clamp.
-                    Text("Tap for details").font(.caption2).foregroundStyle(BackupTheme.blue)
+                    Text("点击查看详情").font(.caption2).foregroundStyle(BackupTheme.blue)
                 }
                 if let fraction = item.state.fraction, item.state.isWorking {
                     ProgressView(value: fraction).tint(BackupTheme.blue)
@@ -228,10 +228,10 @@ struct UploadsView: View {
         .swipeActions {
             if item.state.isFinished {
                 if item.state != .done && item.state != .alreadyBackedUp {
-                    Button("Retry") { queue.retry(item.id) }.tint(BackupTheme.blue)
+                    Button("重试") { queue.retry(item.id) }.tint(BackupTheme.blue)
                 }
             } else {
-                Button("Cancel", role: .destructive) { queue.cancel(item.id) }
+                Button("取消", role: .destructive) { queue.cancel(item.id) }
             }
         }
     }
@@ -241,8 +241,8 @@ struct UploadsView: View {
     private func failureSheet(_ failure: FailureDetail) -> some View {
         NavigationView {
             List {
-                Section("Item") { Text(failure.name).font(.subheadline) }
-                Section("What Google said") {
+                Section("项目") { Text(failure.name).font(.subheadline) }
+                Section("Google 返回的信息") {
                     Text(failure.reason)
                         .font(.footnote)
                         .textSelection(.enabled)
@@ -252,22 +252,22 @@ struct UploadsView: View {
                     Button {
                         UIPasteboard.general.string = "\(failure.name)\n\(failure.reason)"
                     } label: {
-                        Label("Copy Details", systemImage: "doc.on.doc")
+                        Label("复制详情", systemImage: "doc.on.doc")
                     }
                     Button {
                         queue.retry(failure.id)
                         inspectedFailure = nil
                     } label: {
-                        Label("Retry This Item", systemImage: "arrow.clockwise")
+                        Label("重试此项目", systemImage: "arrow.clockwise")
                     }
                 }
             }
             .listStyle(.insetGrouped)
-            .navigationTitle("Upload Failed")
+            .navigationTitle("上传失败")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") { inspectedFailure = nil }
+                    Button("完成") { inspectedFailure = nil }
                 }
             }
         }

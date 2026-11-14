@@ -68,7 +68,7 @@ struct OnboardingView: View {
                         .font(.body.weight(.semibold))
                         .frame(width: 44, height: 44)
                 }
-                .accessibilityLabel("Back")
+                .accessibilityLabel("返回")
             } else {
                 Color.clear.frame(width: 44, height: 44)
             }
@@ -96,12 +96,12 @@ struct OnboardingView: View {
                     AppMark(size: 112)
                 }
             ),
-            eyebrow: "PHOTOS BACKUP",
-            title: "Your memories, safely backed up",
-            message: "Choose the albums that matter. Photos Backup keeps them protected in your Google Photos library.",
-            primaryTitle: "Get Started",
+            eyebrow: "照片备份",
+            title: "安全备份珍贵回忆",
+            message: "选择重要的相簿，将照片和视频备份到您的 Google 相册。",
+            primaryTitle: "开始使用",
             primaryAction: next,
-            credit: "Built with GPMC by xob0t"
+            credit: "基于 xob0t 的 GPMC 技术"
         )
     }
 
@@ -115,9 +115,9 @@ struct OnboardingView: View {
                         .foregroundStyle(.pink, .purple)
                 }
             ),
-            eyebrow: "YOUR LIBRARY",
-            title: "Choose what to protect",
-            message: "Allow photo access so you can pick albums and back up individual photos. Your library stays private on this device.",
+            eyebrow: "您的照片图库",
+            title: "选择要备份的内容",
+            message: "允许访问照片后，即可选择相簿或单张照片进行备份。照片图库仍保存在此设备上。",
             primaryTitle: permissionButtonTitle,
             primaryAction: {
                 Task {
@@ -131,7 +131,7 @@ struct OnboardingView: View {
                     }
                 }
             },
-            secondaryTitle: albums.authorization == .denied || albums.authorization == .restricted ? "Continue without access" : nil,
+            secondaryTitle: albums.authorization == .denied || albums.authorization == .restricted ? "暂不授权，继续" : nil,
             secondaryAction: next
         )
     }
@@ -146,10 +146,10 @@ struct OnboardingView: View {
                         .foregroundStyle(BackupTheme.blue)
                 }
             ),
-            eyebrow: "CONNECT YOUR ACCOUNT",
-            title: "Sign in with Google",
-            message: "Connect your Google account to back up to Google Photos. Sign-in opens in a secure in-app window — sign in, then tap I agree.",
-            primaryTitle: "Connect Google Account",
+            eyebrow: "连接账号",
+            title: "登录 Google",
+            message: "连接 Google 账号即可备份到 Google 相册。登录窗口将在应用内打开，登录后请点击“I agree（同意）”。",
+            primaryTitle: "连接 Google 账号",
             primaryAction: { showingConnect = true }
         )
     }
@@ -175,12 +175,12 @@ struct OnboardingView: View {
                     Text(connectionMessage).font(.body).foregroundStyle(.secondary).multilineTextAlignment(.center).lineSpacing(3).padding(.top, 12)
                     Spacer(minLength: 28)
                     if !connectionVerified {
-                        Button(probe.running ? "Verifying…" : (connectionFailed ? "Try Again" : "Check Again")) {
+                        Button(probe.running ? "正在验证…" : (connectionFailed ? "重试" : "再次检查")) {
                             if connectionFailed { showingConnect = true } else { verifyConnection() }
                         }
                         .buttonStyle(PrimaryButtonStyle()).disabled(probe.running)
                         if !probe.running {
-                            Button("Connect a Different Account") { showingConnect = true }
+                            Button("连接其他账号") { showingConnect = true }
                                 .font(.headline)
                                 .frame(minHeight: 44)
                                 .padding(.top, 8)
@@ -199,9 +199,9 @@ struct OnboardingView: View {
     private var chooseFolders: some View {
         VStack(spacing: 0) {
             VStack(spacing: 7) {
-                Text("CHOOSE ALBUMS").font(.caption.weight(.bold)).tracking(1.2).foregroundStyle(BackupTheme.blue)
-                Text("What should we back up?").font(.largeTitle.bold()).multilineTextAlignment(.center)
-                Text("You can change this anytime in Albums.")
+                Text("选择相簿").font(.caption.weight(.bold)).tracking(1.2).foregroundStyle(BackupTheme.blue)
+                Text("要备份哪些内容？").font(.largeTitle.bold()).multilineTextAlignment(.center)
+                Text("您随时可以在“相簿”中更改选择。")
                     .font(.body).foregroundStyle(.secondary)
             }
             .padding(.horizontal, 24)
@@ -220,13 +220,13 @@ struct OnboardingView: View {
                         .padding(20)
                     }
                 } else {
-                    EmptyState(symbol: "photo.badge.exclamationmark", title: "Photo access is off", message: "You can choose albums later after allowing photo access in Settings.")
+                    EmptyState(symbol: "photo.badge.exclamationmark", title: "照片访问权限未开启", message: "您可以稍后在设置中授权照片访问，再选择相簿。")
                     Spacer()
                 }
             }
 
             VStack(spacing: 10) {
-                Button(preferences.selectedAlbumIDs.isEmpty ? "Choose Later" : "Continue") { next() }
+                Button(preferences.selectedAlbumIDs.isEmpty ? "稍后选择" : "继续") { next() }
                     .buttonStyle(PrimaryButtonStyle())
                 Text("\(preferences.selectedAlbumIDs.count) selected")
                     .font(.footnote).foregroundStyle(.secondary)
@@ -241,9 +241,9 @@ struct OnboardingView: View {
                 VStack(spacing: 0) {
                     Spacer(minLength: 30)
                     FeatureIcon(symbol: "wifi", size: 76)
-                    Text("When should we back up?")
+                    Text("何时进行备份？")
                         .font(.largeTitle.bold()).multilineTextAlignment(.center).padding(.top, 24)
-                    Text("Choose how Photos Backup uses your connection.")
+                    Text("选择照片备份使用网络的方式。")
                         .font(.body).foregroundStyle(.secondary).multilineTextAlignment(.center).padding(.top, 10)
 
                     VStack(spacing: 12) {
@@ -267,11 +267,11 @@ struct OnboardingView: View {
                     }
                     .padding(.top, 28)
 
-                    Toggle("Back up selected albums automatically", isOn: $preferences.automaticBackup)
+                    Toggle("自动备份所选相簿", isOn: $preferences.automaticBackup)
                         .font(.subheadline.weight(.medium))
                         .padding(.top, 22)
                     Spacer(minLength: 28)
-                    Button("Continue") { next() }.buttonStyle(PrimaryButtonStyle())
+                    Button("继续") { next() }.buttonStyle(PrimaryButtonStyle())
                 }
                 .padding(24)
                 .frame(minHeight: geometry.size.height)
@@ -290,10 +290,10 @@ struct OnboardingView: View {
                         .foregroundStyle(.green)
                 }
             ),
-            eyebrow: "ALL SET",
-            title: "Your backup is ready",
+            eyebrow: "全部准备就绪",
+            title: "备份已准备就绪",
             message: completionMessage,
-            primaryTitle: "Go to Photos Backup",
+            primaryTitle: "进入照片备份",
             primaryAction: finish
         )
     }
@@ -332,7 +332,7 @@ struct OnboardingView: View {
                             .foregroundStyle(.secondary)
                             .frame(minHeight: 44)
                             .padding(.top, 4)
-                            .accessibilityHint("Opens the GPMC project on GitHub")
+                            .accessibilityHint("在 GitHub 上打开 GPMC 项目")
                     }
                 }
                 .padding(.horizontal, 24)
@@ -345,9 +345,9 @@ struct OnboardingView: View {
 
     private var permissionButtonTitle: String {
         switch albums.authorization {
-        case .authorized, .limited: return "Continue"
-        case .denied, .restricted: return "Open Settings"
-        default: return "Allow Photo Access"
+        case .authorized, .limited: return "继续"
+        case .denied, .restricted: return "打开设置"
+        default: return "允许访问照片"
         }
     }
 
@@ -385,25 +385,25 @@ struct OnboardingView: View {
     }
 
     private var connectionEyebrow: String {
-        if connectionVerified { return "CONNECTION VERIFIED" }
-        if connectionFailed { return "COULDN’T CONNECT" }
-        return probe.running ? "VERIFYING ACCOUNT" : "WAITING TO CONNECT"
+        if connectionVerified { return "连接验证成功" }
+        if connectionFailed { return "无法连接" }
+        return probe.running ? "正在验证账号" : "等待连接"
     }
 
     private var connectionTitle: String {
-        if connectionVerified { return "You’re connected" }
-        if connectionFailed { return "Let’s try that again" }
-        return probe.running ? "Checking your account…" : "Finish connecting"
+        if connectionVerified { return "连接成功" }
+        if connectionFailed { return "请再试一次" }
+        return probe.running ? "正在检查账号…" : "完成连接"
     }
 
     private var connectionMessage: String {
-        if connectionVerified { return "Photos Backup verified your Google Photos account. You’re ready to continue." }
+        if connectionVerified { return "照片备份已验证您的 Google 相册账号，可以继续。" }
         if connectionFailed {
-            return "We received the sign-in, but couldn’t verify it. Tap Try Again, sign in, and tap I agree."
+            return "已收到登录信息，但无法完成验证。请点击“重试”，重新登录并点击“I agree（同意）”。"
         }
         return probe.running
-            ? "We securely captured your sign-in and are verifying your Google Photos access."
-            : "Sign in and tap I agree in the connect window. We’ll verify everything before continuing."
+            ? "已安全获取登录凭据，正在验证 Google 相册访问权限。"
+            : "请在登录窗口登录并点击“I agree（同意）”，我们会在继续前完成验证。"
     }
 
     private func logState(_ id: String) -> ProbeStep.State? {

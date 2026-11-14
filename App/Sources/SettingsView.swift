@@ -26,19 +26,19 @@ struct SettingsView: View {
                 supportSection
                 aboutSection
             }
-            .navigationTitle("Settings")
-            .confirmationDialog("Disconnect Google Photos?", isPresented: $confirmDisconnect, titleVisibility: .visible) {
-                Button("Disconnect", role: .destructive) { Task { await account.disconnect() } }
-                Button("Cancel", role: .cancel) {}
+            .navigationTitle("设置")
+            .confirmationDialog("断开 Google 相册连接吗？", isPresented: $confirmDisconnect, titleVisibility: .visible) {
+                Button("断开连接", role: .destructive) { Task { await account.disconnect() } }
+                Button("取消", role: .cancel) {}
             } message: {
-                Text("New backups will stop until you connect again. Photos already backed up are not affected.")
+                Text("断开连接后将无法继续备份，直到重新连接；已备份的照片不受影响。")
             }
         }
         .navigationViewStyle(.stack)
     }
 
     private var accountSection: some View {
-        Section("Google Photos Account") {
+        Section("Google 相册账号") {
             HStack(alignment: .top, spacing: 12) {
                 FeatureIcon(symbol: "person.crop.circle.fill", size: 44)
                 VStack(alignment: .leading, spacing: 3) {
@@ -57,7 +57,7 @@ struct SettingsView: View {
                 Image(systemName: account.status.isUsable ? "checkmark.circle.fill" : "exclamationmark.circle.fill")
                     .font(.title2)
                     .foregroundStyle(account.status.isUsable ? Color.green : Color.orange)
-                    .accessibilityLabel(account.status.isUsable ? "Connected" : "Action needed")
+                    .accessibilityLabel(account.status.isUsable ? "已连接" : "需要处理")
             }
             .padding(.vertical, 4)
 
@@ -72,12 +72,12 @@ struct SettingsView: View {
                     }
                 } label: {
                     HStack {
-                        Text(account.verifying ? "Checking Connection…" : "Check Connection")
+                        Text(account.verifying ? "正在检查连接…" : "检查连接")
                         Spacer()
                         if account.verifying {
                             ProgressView()
                         } else if connectionCheckResult == .succeeded {
-                            Label("Verified", systemImage: "checkmark.circle.fill")
+                            Label("已验证", systemImage: "checkmark.circle.fill")
                                 .font(.subheadline.weight(.semibold))
                                 .foregroundStyle(.green)
                                 .transition(.scale.combined(with: .opacity))
@@ -85,9 +85,9 @@ struct SettingsView: View {
                     }
                 }
                     .disabled(account.verifying)
-                Button("Disconnect Account", role: .destructive) { confirmDisconnect = true }
+                Button("断开账号", role: .destructive) { confirmDisconnect = true }
             } else {
-                Button("Connect Account") { showTutorial() }
+                Button("连接账号") { showTutorial() }
             }
 
             if case .failed(let reason) = connectionCheckResult, account.status.isUsable {
@@ -99,10 +99,10 @@ struct SettingsView: View {
 
             if account.status.isUsable, let warning = account.persistenceWarning {
                 VStack(alignment: .leading, spacing: 8) {
-                    Label("Not saved to Keychain", systemImage: "key.slash")
+                    Label("未保存到钥匙串", systemImage: "key.slash")
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(.orange)
-                    Text(warning + " The account works for this session but may need to be connected again after relaunch.")
+                    Text(warning + " 此次使用期间账号有效，但重新打开应用后可能需要再次连接。")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -117,8 +117,8 @@ struct SettingsView: View {
 
     private var backupSection: some View {
         Section {
-            Toggle("Automatic Backup", isOn: $preferences.automaticBackup)
-            Picker("Use Connection", selection: $preferences.connection) {
+            Toggle("自动备份", isOn: $preferences.automaticBackup)
+            Picker("使用的网络", selection: $preferences.connection) {
                 ForEach(BackupConnection.allCases) { option in Text(option.title).tag(option) }
             }
             if let reason = queue.networkPauseReason {
@@ -126,16 +126,16 @@ struct SettingsView: View {
                     .font(.footnote)
                     .foregroundStyle(.orange)
             }
-            Picker("Simultaneous Uploads", selection: $preferences.concurrentUploads) {
+            Picker("同时上传数量", selection: $preferences.concurrentUploads) {
                 ForEach(Array(UploadQueue.concurrencyRange), id: \.self) { count in
                     Text(count.formatted()).tag(count)
                 }
             }
-            Toggle("Storage Saver", isOn: $preferences.storageSaver)
-            Toggle("Count Against Storage Quota", isOn: $preferences.useQuota)
-            Toggle("Back Up Live Photo Motion", isOn: $preferences.backUpLivePhotoMotion)
+            Toggle("节省存储空间画质", isOn: $preferences.storageSaver)
+            Toggle("计入 Google 存储配额", isOn: $preferences.useQuota)
+            Toggle("备份实况照片动态部分", isOn: $preferences.backUpLivePhotoMotion)
         } header: {
-            Text("Backup")
+            Text("备份")
         } footer: {
             Text("More simultaneous uploads finish a large backup sooner. Each one stages a full-size copy on the device while it runs, so high values use more storage, battery and data at once — 2 suits most phones. Lowering it lets uploads already running finish first.\n\nStorage Saver asks Google Photos to reduce file size. With Count Against Storage Quota off, uploads identify as an older Pixel phone so they don't use your Google storage; the Google Photos app may then label them “Storage saver” even though the original file was kept. The file size, or Google Photos on the web, shows the real quality.\n\nBack Up Live Photo Motion attaches each Live Photo's motion to its photo, so it plays as a Live Photo in Google Photos and the Google Photos app's Free up space can remove it from this iPhone. It uploads the short video too, a few MB per Live Photo, and uses storage the same way the photo does. Live Photos backed up earlier get their motion added in the background.")
         }
@@ -147,7 +147,7 @@ struct SettingsView: View {
                 runVerification()
             } label: {
                 HStack {
-                    Text(isVerifying ? "Re-checking…" : "Re-check Backups")
+                    Text(isVerifying ? "正在重新检查…" : "重新检查备份")
                     Spacer()
                     if isVerifying { ProgressView() }
                 }
@@ -160,17 +160,17 @@ struct SettingsView: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
         } header: {
-            Text("Re-check")
+            Text("重新检查")
         } footer: {
-            Text("Compares your selected albums against Google Photos again. Items still in the cloud finish quickly; anything deleted there is queued for upload again.")
+            Text("重新将所选相簿与 Google 相册对比。云端仍存在的项目会很快完成检查；已从云端删除的内容将重新加入上传队列。")
         }
     }
 
     private var keepAliveSection: some View {
         Section {
-            Toggle("Keep Running in Background", isOn: $preferences.keepAliveEnabled)
+            Toggle("保持后台运行", isOn: $preferences.keepAliveEnabled)
             if preferences.keepAliveEnabled {
-                Picker("Method", selection: $preferences.keepAliveMode) {
+                Picker("方式", selection: $preferences.keepAliveMode) {
                     ForEach(KeepAliveMode.allCases) { mode in Text(mode.title).tag(mode) }
                 }
                 Text(preferences.keepAliveMode.detail)
@@ -179,7 +179,7 @@ struct SettingsView: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
         } header: {
-            Text("Background")
+            Text("后台")
         } footer: {
             Text("iOS normally pauses the app seconds after you leave it, and backs up only when it grants a background window. With this on, the backup keeps going after you switch apps or lock the phone, two uploads at a time, until everything is backed up — then the app sleeps again. It uses more battery; leaving the phone charging works best. Start a backup with the app open; swiping the app away from the app switcher stops it. Each run stops itself after 12 hours.\n\nWith it off, the screen stays on while a backup runs with the app open, since locking the phone would pause it.")
         }
@@ -189,7 +189,7 @@ struct SettingsView: View {
         Section {
             ShortcutsSettingsRows()
         } header: {
-            Text("Shortcuts")
+            Text("快捷指令")
         } footer: {
             Text("In the Shortcuts app, create a personal automation — when the iPhone connects to power, at a time of day, or when it joins your home Wi-Fi — set it to run immediately, and add Back Up Photos. Each run has about 30 seconds: it finds new photos in the selected albums and hands them to iOS to upload in the background. It runs even with Automatic Backup off, and still follows Use Connection and Pause. Photos stored only in iCloud wait until the app is open.")
         }
@@ -211,40 +211,40 @@ struct SettingsView: View {
     }
 
     private var supportSection: some View {
-        Section("Support") {
-            NavigationLink("Create Diagnostic Report") { DiagnosticReportView() }
-            NavigationLink("Storage") { StorageUsageView() }
-            NavigationLink("Diagnostics") { DiagnosticsView() }
-            Button("Run Onboarding Again") {
+        Section("支持") {
+            NavigationLink("生成诊断报告") { DiagnosticReportView() }
+            NavigationLink("存储空间") { StorageUsageView() }
+            NavigationLink("诊断") { DiagnosticsView() }
+            Button("重新查看新手引导") {
                 preferences.resetOnboarding()
             }
         }
     }
 
     private var aboutSection: some View {
-        Section("About") {
-            LabeledRow("App", value: "Photos Backup")
-            LabeledRow("Version", value: appVersion)
+        Section("关于") {
+            LabeledRow("应用", value: "照片备份")
+            LabeledRow("版本", value: appVersion)
             LabeledRow("iOS", value: UIDevice.current.systemVersion)
-            LabeledRow("Core technology") {
-                Link("GPMC by xob0t", destination: gpmcURL)
+            LabeledRow("核心技术") {
+                Link("GPMC（作者 xob0t）", destination: gpmcURL)
             }
         }
     }
 
     private var accountTitle: String {
         switch account.status {
-        case .loading: return "Checking account…"
-        case .disconnected: return "Not connected"
+        case .loading: return "正在检查账号…"
+        case .disconnected: return "未连接"
         case .connected(let email, _): return email
-        case .rejected(let email, _): return email.isEmpty ? "Sign in again" : email
+        case .rejected(let email, _): return email.isEmpty ? "重新登录" : email
         }
     }
 
     private var accountSubtitle: String {
         switch account.status {
-        case .loading: return "Looking for a saved credential"
-        case .disconnected: return "Connect to start backing up"
+        case .loading: return "正在查找已保存的登录凭据"
+        case .disconnected: return "连接后即可开始备份"
         case .connected(_, let since): return "Connected · \(since.formatted(date: .abbreviated, time: .omitted))"
         case .rejected(_, let reason): return reason
         }
@@ -265,17 +265,17 @@ private struct ShortcutsSettingsRows: View {
     var body: some View {
         Group {
             if #available(iOS 16.0, *) {
-                Label("Back Up Photos action", systemImage: "square.stack.3d.up.fill")
-                Link("Open Shortcuts", destination: URL(string: "shortcuts://")!)
+                Label("“备份照片”快捷指令", systemImage: "square.stack.3d.up.fill")
+                Link("打开快捷指令", destination: URL(string: "shortcuts://")!)
                 if let lastRun {
                     AutomaticRunRow(run: lastRun)
                 } else {
-                    Text("The action has not run yet.")
+                    Text("该快捷指令尚未运行。")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 }
             } else {
-                Label("Requires iOS 16 or later", systemImage: "info.circle")
+                Label("需要 iOS 16 或更新版本", systemImage: "info.circle")
                     .foregroundStyle(.secondary)
             }
         }

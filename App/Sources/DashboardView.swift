@@ -19,7 +19,7 @@ struct DashboardView: View {
         albums.albums.filter { preferences.selectedAlbumIDs.contains($0.id) }
     }
 
-    /// Unique-item estimate for the selection. "All Photos" spans the whole
+    /// Unique-item estimate for the selection. "所有照片" spans the whole
     /// image/video library, so when it is selected every other album is a
     /// subset of it — summing per-album counts would count most assets twice.
     private var selectedItemCount: Int {
@@ -41,7 +41,7 @@ struct DashboardView: View {
                 .padding(.bottom, 24)
             }
             .background(BackupTheme.background)
-            .navigationTitle("Photos Backup")
+            .navigationTitle("照片备份")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     accountToolbarItem
@@ -51,12 +51,12 @@ struct DashboardView: View {
                 PhotoPicker { sources in enqueue(sources) }.ignoresSafeArea()
             }
             .confirmationDialog(
-                "Stop all backups?",
+                "停止所有备份吗？",
                 isPresented: $showingStopBackupConfirmation,
                 titleVisibility: .visible
             ) {
-                Button("Stop Backup", role: .destructive) { stopBackup() }
-                Button("Keep Backing Up", role: .cancel) {}
+                Button("停止备份", role: .destructive) { stopBackup() }
+                Button("继续备份", role: .cancel) {}
             } message: {
                 Text(stopBackupMessage)
             }
@@ -83,21 +83,21 @@ struct DashboardView: View {
     @ViewBuilder private var accountBanner: some View {
         switch account.status {
         case .loading:
-            banner(color: .blue, symbol: "hourglass", title: "Checking your account", message: "Just a moment…")
+            banner(color: .blue, symbol: "hourglass", title: "正在检查账号", message: "请稍候…")
         case .disconnected:
             Button(action: onConnect) {
-                banner(color: .orange, symbol: "person.crop.circle.badge.exclamationmark", title: "Connect Google Photos", message: "Sign in to start protecting your library", showsChevron: true)
+                banner(color: .orange, symbol: "person.crop.circle.badge.exclamationmark", title: "连接 Google 相册", message: "登录后即可开始备份照片图库", showsChevron: true)
             }
             .buttonStyle(.plain)
         case .connected:
             if let warning = account.persistenceWarning {
-                banner(color: .orange, symbol: "key.slash", title: "Not saved to Keychain", message: warning, showsChevron: false)
+                banner(color: .orange, symbol: "key.slash", title: "未保存到钥匙串", message: warning, showsChevron: false)
             } else if let reason = queue.pauseReason {
-                banner(color: .orange, symbol: "pause.circle.fill", title: "Backup paused", message: reason, showsChevron: false)
+                banner(color: .orange, symbol: "pause.circle.fill", title: "备份已暂停", message: reason, showsChevron: false)
             }
         case .rejected(_, let reason):
             Button(action: onConnect) {
-                banner(color: .red, symbol: "exclamationmark.arrow.circlepath", title: "Sign in again", message: reason, showsChevron: true)
+                banner(color: .red, symbol: "exclamationmark.arrow.circlepath", title: "重新登录", message: reason, showsChevron: true)
             }
             .buttonStyle(.plain)
         }
@@ -127,11 +127,11 @@ struct DashboardView: View {
             Divider()
 
             HStack {
-                metric(value: queue.completedSourceCount.formatted(), label: "Backed up")
+                metric(value: queue.completedSourceCount.formatted(), label: "已备份")
                 Divider().frame(height: 38)
-                metric(value: selectedAlbums.count.formatted(), label: "Albums")
+                metric(value: selectedAlbums.count.formatted(), label: "相簿")
                 Divider().frame(height: 38)
-                metric(value: queue.activeCount.formatted(), label: "In queue")
+                metric(value: queue.activeCount.formatted(), label: "等待上传")
             }
 
             if !queue.isIdle || queue.isUserPaused {
@@ -140,7 +140,7 @@ struct DashboardView: View {
                         Button {
                             queue.resumeUserPausedUploads()
                         } label: {
-                            Label("Resume", systemImage: "play.circle")
+                            Label("继续", systemImage: "play.circle")
                                 .font(.subheadline.weight(.semibold))
                                 .frame(maxWidth: .infinity)
                         }
@@ -151,7 +151,7 @@ struct DashboardView: View {
                         Button {
                             queue.pauseAfterCurrentUploads()
                         } label: {
-                            Label("Pause", systemImage: "pause.circle")
+                            Label("暂停", systemImage: "pause.circle")
                                 .font(.subheadline.weight(.semibold))
                                 .frame(maxWidth: .infinity)
                         }
@@ -164,7 +164,7 @@ struct DashboardView: View {
                         Button(role: .destructive) {
                             showingStopBackupConfirmation = true
                         } label: {
-                            Label("Stop", systemImage: "stop.circle")
+                            Label("停止", systemImage: "stop.circle")
                                 .font(.subheadline.weight(.semibold))
                                 .frame(maxWidth: .infinity)
                         }
@@ -193,7 +193,7 @@ struct DashboardView: View {
             && !isStartingManualRun && !queue.isUserPaused
         return Button(action: backUpSelectedAlbums) {
             quickActionLabel(symbol: "arrow.up.circle.fill",
-                             title: isStartingManualRun ? "Checking…" : "Back Up Now",
+                             title: isStartingManualRun ? "Checking…" : "立即备份",
                              detail: backUpActionDetail,
                              isEnabled: enabled)
         }
@@ -201,8 +201,8 @@ struct DashboardView: View {
     }
 
     private var backUpActionDetail: String {
-        if selectedAlbums.isEmpty { return "Choose albums first" }
-        if queue.isUserPaused { return "Backup is paused" }
+        if selectedAlbums.isEmpty { return "请先选择相簿" }
+        if queue.isUserPaused { return "备份已暂停" }
         let backedUp = selectedBackedUpCount
         guard selectedItemCount > 0 else { return "\(selectedItemCount.formatted()) items" }
         return "\(backedUp.formatted()) of \(selectedItemCount.formatted()) backed up"
@@ -220,7 +220,7 @@ struct DashboardView: View {
     private var photoPickerAction: some View {
         let enabled = account.status.isUsable
         return Button { showPicker = true } label: {
-            quickActionLabel(symbol: "photo.badge.plus", title: "Pick Photos", detail: "Manual backup", isEnabled: enabled)
+            quickActionLabel(symbol: "photo.badge.plus", title: "选择照片", detail: "手动备份", isEnabled: enabled)
         }
         .disabled(!enabled)
     }
@@ -228,10 +228,10 @@ struct DashboardView: View {
     private var folderSummary: some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack {
-                Text("Selected Albums").font(.headline)
+                Text("已选相簿").font(.headline)
                 Spacer()
                 if preferences.automaticBackup {
-                    StatusPill(text: "Automatic", symbol: "arrow.triangle.2.circlepath", color: .green)
+                    StatusPill(text: "自动备份", symbol: "arrow.triangle.2.circlepath", color: .green)
                 }
             }
             if let manualRunMessage {
@@ -241,7 +241,7 @@ struct DashboardView: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
             if selectedAlbums.isEmpty {
-                Text("No albums selected yet. Choose albums from the Albums tab.")
+                Text("尚未选择相簿，请前往“相簿”页面选择。")
                     .font(.subheadline).foregroundStyle(.secondary)
             } else {
                 ForEach(Array(selectedAlbums.prefix(4).enumerated()), id: \.element.id) { index, album in
@@ -271,7 +271,7 @@ struct DashboardView: View {
 
     private var recentActivity: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Recent Activity").font(.headline)
+            Text("最近的备份记录").font(.headline)
             ForEach(Array(queue.items.suffix(3).reversed())) { item in
                 HStack(spacing: 12) {
                     FeatureIcon(symbol: symbol(item.state), color: tint(item.state), size: 40)
@@ -298,8 +298,8 @@ struct DashboardView: View {
             .contentShape(Circle())
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(account.status.isUsable ? "Account connected" : "Account not connected")
-        .accessibilityHint("Opens account settings")
+        .accessibilityLabel(account.status.isUsable ? "账号已连接" : "账号未连接")
+        .accessibilityHint("打开账号设置")
     }
 
     private func banner(color: Color, symbol: String, title: String, message: String, showsChevron: Bool = false) -> some View {
@@ -336,21 +336,21 @@ struct DashboardView: View {
     }
 
     private var heroTitle: String {
-        if !account.status.isUsable { return "Connect to back up" }
-        if queue.pauseReason != nil { return "Backup paused" }
-        if !queue.isIdle { return "Backing up…" }
-        if queue.failedCount > 0 { return "Backup needs attention" }
-        if queue.completedSourceCount == 0 { return "Ready to back up" }
-        return "Backup complete"
+        if !account.status.isUsable { return "连接账号后开始备份" }
+        if queue.pauseReason != nil { return "备份已暂停" }
+        if !queue.isIdle { return "正在备份…" }
+        if queue.failedCount > 0 { return "备份需要处理" }
+        if queue.completedSourceCount == 0 { return "准备就绪" }
+        return "备份完成"
     }
 
     private var heroSubtitle: String {
-        if !account.status.isUsable { return "Connect an account to get started" }
+        if !account.status.isUsable { return "请先连接账号" }
         if let reason = queue.pauseReason { return reason }
         if !queue.isIdle { return "\(queue.activeCount) items remaining" }
         if queue.failedCount > 0 { return "\(queue.failedCount) items failed — open Activity to retry" }
-        if selectedAlbums.isEmpty { return "Choose albums to protect" }
-        return "Your selected albums are up to date"
+        if selectedAlbums.isEmpty { return "选择需要备份的相簿" }
+        return "所选相簿已全部备份"
     }
 
     private var heroProgress: Double {
@@ -396,9 +396,9 @@ struct DashboardView: View {
 
     static func message(for outcome: AutomaticBackupCoordinator.ManualRunOutcome) -> String {
         switch outcome {
-        case .noLibraryAccess: return "Allow photo access in Settings to back up your albums."
-        case .noAlbumsSelected: return "Choose albums in the Albums tab first."
-        case .nothingToDo: return "Everything in your selected albums is already backed up."
+        case .noLibraryAccess: return "请在设置中允许访问照片，才能备份相簿。"
+        case .noAlbumsSelected: return "请先到“相簿”页面选择相簿。"
+        case .nothingToDo: return "所选相簿中的内容均已备份。"
         case .started(let count): return "Backing up \(count.formatted()) items. Watch progress in Activity."
         case .rechecking(let count): return "Re-checking \(count.formatted()) items against Google Photos."
         }
@@ -406,9 +406,9 @@ struct DashboardView: View {
 
     private var stopBackupMessage: String {
         if preferences.automaticBackup {
-            return "Uploads in progress will be cancelled, the queue will be cleared, and Automatic Backup will be turned off. Photos already backed up are not affected."
+            return "将取消正在进行的上传、清空队列并关闭自动备份；已备份的照片不受影响。"
         }
-        return "Uploads in progress will be cancelled and the queue will be cleared. Photos already backed up are not affected."
+        return "将取消正在进行的上传并清空队列；已备份的照片不受影响。"
     }
 
     private func stopBackup() {

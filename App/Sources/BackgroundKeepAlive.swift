@@ -14,17 +14,17 @@ enum KeepAliveMode: String, CaseIterable, Identifiable, Sendable {
 
     var title: String {
         switch self {
-        case .audio: return "Silent Audio"
-        case .location: return "Location"
+        case .audio: return "静音音频"
+        case .location: return "定位"
         }
     }
 
     var detail: String {
         switch self {
         case .audio:
-            return "Plays silence mixed with other audio. Another app taking over audio, such as a call, can stop it until the app is opened again."
+            return "播放混合在其他声音中的静音音频。通话等应用接管音频时可能中断，需重新打开本应用。"
         case .location:
-            return "Asks for coarse location, about 3 km, and ignores it. Holds up through calls and music, but needs location access and iOS shows the location arrow."
+            return "请求约 3 公里精度的粗略位置信息，但不会使用位置数据。通话或播放音乐期间也能维持后台运行，不过需要定位权限，且 iOS 会显示定位图标。"
         }
     }
 }

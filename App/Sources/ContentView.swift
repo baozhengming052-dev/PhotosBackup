@@ -36,19 +36,19 @@ private struct MainAppView: View {
                 onConnect: { showConnectionTutorial = true },
                 onAccount: { selectedTab = 3 }
             )
-                .tabItem { Label("Home", systemImage: "house.fill") }
+                .tabItem { Label("首页", systemImage: "house.fill") }
                 .tag(0)
 
             FolderSelectionView()
-                .tabItem { Label("Albums", systemImage: "rectangle.stack.fill") }
+                .tabItem { Label("相簿", systemImage: "rectangle.stack.fill") }
                 .tag(1)
 
             UploadsView()
-                .tabItem { Label("Activity", systemImage: "arrow.up.circle.fill") }
+                .tabItem { Label("备份记录", systemImage: "arrow.up.circle.fill") }
                 .tag(2)
 
             SettingsView { showConnectionTutorial = true }
-                .tabItem { Label("Settings", systemImage: "gearshape.fill") }
+                .tabItem { Label("设置", systemImage: "gearshape.fill") }
                 .tag(3)
         }
         // Full screen, like onboarding's connect step. As a sheet, an
