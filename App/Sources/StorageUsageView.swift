@@ -7,14 +7,14 @@ struct StorageUsageView: View {
 
     var body: some View {
         List {
-            Section("Used by Photos Backup") {
-                storageRow("Pending upload copies", bytes: snapshot?.stagedUploads)
-                storageRow("Backup history and queue", bytes: snapshot?.backupRecords)
-                storageRow("Completed transfer receipts", bytes: snapshot?.transferResults)
+            Section("照片备份占用的空间") {
+                storageRow("等待上传的文件副本", bytes: snapshot?.stagedUploads)
+                storageRow("备份历史与任务队列", bytes: snapshot?.backupRecords)
+                storageRow("已完成的传输回执", bytes: snapshot?.transferResults)
             }
 
-            Section("System-managed") {
-                storageRow("Network and web caches", bytes: snapshot?.caches)
+            Section("由系统管理") {
+                storageRow("网络和网页缓存", bytes: snapshot?.caches)
             }
 
             Section {
@@ -22,22 +22,22 @@ struct StorageUsageView: View {
                     cleanUp()
                 } label: {
                     HStack {
-                        Label("Clean Up Unused Data", systemImage: "sparkles")
+                        Label("清理无用数据", systemImage: "sparkles")
                         Spacer()
                         if isCleaning { ProgressView() }
                     }
                 }
                 .disabled(isCleaning)
             } footer: {
-                Text("Cleanup removes caches, old orphaned transfer receipts, and upload copies that are not owned by the current queue. It keeps pending uploads, your Google account, and the small history used to prevent duplicate backups.")
+                Text("清理操作会删除缓存、失效的传输回执和不属于当前队列的上传副本；不会删除待上传内容、Google 账号或用于避免重复备份的记录。")
             }
 
-            Section("What is retained") {
-                Text("Pending uploads keep a full-size local copy until Google confirms the backup. Large videos are therefore the main source of temporary storage use.")
-                Text("Backup history stores account-scoped PhotoKit identifiers. It is much smaller than the media and prevents every scan from uploading the same photos again.")
+            Section("保留的数据") {
+                Text("待上传的内容会保留一份完整本地副本，直到 Google 确认备份。因此大型视频通常是临时空间占用的主要来源。")
+                Text("备份历史会保存与账号关联的照片标识，体积远小于媒体文件，可避免每次扫描都重复上传。")
             }
         }
-        .navigationTitle("Storage")
+        .navigationTitle("存储空间")
         .navigationBarTitleDisplayMode(.inline)
         .task { await refresh() }
         .refreshable { await refresh() }
@@ -69,7 +69,7 @@ struct StorageUsageView: View {
             if let before, let after = snapshot?.total {
                 DiagnosticEventLog.shared.record(
                     "storage",
-                    "Cleaned up unused data; freed \(DiagnosticProcessInfo.bytes(max(0, before - after)))"
+                    "已清理无用数据，释放 \(DiagnosticProcessInfo.bytes(max(0, before - after)))"
                 )
             }
             isCleaning = false

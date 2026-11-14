@@ -181,7 +181,7 @@ struct SettingsView: View {
         } header: {
             Text("后台")
         } footer: {
-            Text("iOS normally pauses the app seconds after you leave it, and backs up only when it grants a background window. With this on, the backup keeps going after you switch apps or lock the phone, two uploads at a time, until everything is backed up — then the app sleeps again. It uses more battery; leaving the phone charging works best. Start a backup with the app open; swiping the app away from the app switcher stops it. Each run stops itself after 12 hours.\n\nWith it off, the screen stays on while a backup runs with the app open, since locking the phone would pause it.")
+            Text("正常情况下，离开应用几秒后 iOS 就可能暂停它，只在系统允许的后台时段执行备份。开启此功能后，切换应用或锁屏时可尝试继续备份，每次最多同时上传 2 项，全部完成后再次休眠。此功能更耗电，建议连接充电器；需先打开应用启动备份，在多任务界面上滑关闭应用仍会停止。每次运行最长 12 小时。\n\n关闭此选项时，应用内正在备份期间屏幕会保持亮起，因为锁屏会使备份暂停。")
         }
     }
 
@@ -191,7 +191,7 @@ struct SettingsView: View {
         } header: {
             Text("快捷指令")
         } footer: {
-            Text("In the Shortcuts app, create a personal automation — when the iPhone connects to power, at a time of day, or when it joins your home Wi-Fi — set it to run immediately, and add Back Up Photos. Each run has about 30 seconds: it finds new photos in the selected albums and hands them to iOS to upload in the background. It runs even with Automatic Backup off, and still follows Use Connection and Pause. Photos stored only in iCloud wait until the app is open.")
+            Text("在“快捷指令”中建立个人自动化，例如连接充电器、指定时间或连接家中 Wi-Fi 时立即运行，并添加“备份照片”。每次约有 30 秒来发现选中相簿中的新照片，并将上传任务交给 iOS 后台处理。即使关闭自动备份，此操作仍可运行，但会遵守网络与暂停设置。仅存在于 iCloud 的照片需打开本应用后才能处理。")
         }
     }
 
@@ -245,7 +245,7 @@ struct SettingsView: View {
         switch account.status {
         case .loading: return "正在查找已保存的登录凭据"
         case .disconnected: return "连接后即可开始备份"
-        case .connected(_, let since): return "Connected · \(since.formatted(date: .abbreviated, time: .omitted))"
+        case .connected(_, let since): return "已连接 · \(since.formatted(date: .abbreviated, time: .omitted))"
         case .rejected(_, let reason): return reason
         }
     }

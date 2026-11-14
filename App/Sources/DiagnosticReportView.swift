@@ -17,9 +17,9 @@ struct DiagnosticReportView: View {
     var body: some View {
         List {
             Section {
-                Label("Safe to share publicly", systemImage: "hand.raised.fill")
+                Label("可安全公开分享", systemImage: "hand.raised.fill")
                     .foregroundStyle(.green)
-                Text("The report leaves out credentials, account addresses, photo identifiers, filenames, media, and request URLs.")
+                Text("报告不会包含登录凭据、账号地址、照片标识、文件名、媒体内容及请求网址。")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
             }
@@ -29,7 +29,7 @@ struct DiagnosticReportView: View {
                     generate()
                 } label: {
                     HStack {
-                        Label(report == nil ? "Generate Report" : "Refresh Report", systemImage: "doc.text.magnifyingglass")
+                        Label(report == nil ? "生成报告" : "刷新报告", systemImage: "doc.text.magnifyingglass")
                         Spacer()
                         if isGenerating { ProgressView() }
                     }
@@ -40,13 +40,13 @@ struct DiagnosticReportView: View {
                     Button {
                         showingShareSheet = true
                     } label: {
-                        Label("Share or Save Report", systemImage: "square.and.arrow.up")
+                        Label("分享或保存报告", systemImage: "square.and.arrow.up")
                     }
                     Button {
                         UIPasteboard.general.string = report.text
                         copied = true
                     } label: {
-                        Label(copied ? "Copied" : "Copy Report Text", systemImage: copied ? "checkmark" : "doc.on.doc")
+                        Label(copied ? "Copied" : "复制报告文本", systemImage: copied ? "checkmark" : "doc.on.doc")
                     }
                 }
 
@@ -56,7 +56,7 @@ struct DiagnosticReportView: View {
                         .foregroundStyle(.red)
                 }
             } footer: {
-                Text("Generate the report soon after a problem, then attach the text file to an issue at github.com/g8row/PhotosBackup/issues.")
+                Text("出现问题后请尽快生成报告，并将文本文件附到 github.com/g8row/PhotosBackup/issues 的问题反馈中。")
             }
 
             if let report {
@@ -67,19 +67,19 @@ struct DiagnosticReportView: View {
                             .fixedSize(horizontal: false, vertical: true)
                     }
                 } header: {
-                    Text("What Stands Out")
+                    Text("主要发现")
                 } footer: {
                     Text(report.url.lastPathComponent).font(.caption2.monospaced())
                 }
             }
 
             Section {
-                NavigationLink("Event Timeline") { DiagnosticEventsView() }
+                NavigationLink("事件时间线") { DiagnosticEventsView() }
             } footer: {
-                Text("What the app decided and why, including when iOS started background work and what it achieved.")
+                Text("显示应用执行了哪些操作及原因，包括 iOS 何时启动后台任务以及任务结果。")
             }
         }
-        .navigationTitle("Diagnostic Report")
+        .navigationTitle("诊断报告")
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $showingShareSheet) {
             if let report {
@@ -104,8 +104,8 @@ struct DiagnosticReportView: View {
                     automaticBackup: automaticBackup
                 )
             } catch {
-                errorMessage = "Could not create the report: \(error.localizedDescription)"
-                DiagnosticEventLog.shared.record("support", "Could not create a diagnostic report: \(error.localizedDescription)", level: .error)
+                errorMessage = "无法生成报告：\(error.localizedDescription)"
+                DiagnosticEventLog.shared.record("support", "无法生成诊断报告：\(error.localizedDescription)", level: .error)
             }
             isGenerating = false
         }

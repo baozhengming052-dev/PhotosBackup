@@ -5,8 +5,8 @@ import UIKit
 /// it did without generating and reading a whole report.
 struct DiagnosticEventsView: View {
     private enum Filter: String, CaseIterable, Identifiable {
-        case all = "All"
-        case problems = "Problems"
+        case all = "全部"
+        case problems = "问题"
         var id: Self { self }
     }
 
@@ -17,17 +17,17 @@ struct DiagnosticEventsView: View {
     var body: some View {
         List {
             Section {
-                Picker("Show", selection: $filter) {
+                Picker("显示", selection: $filter) {
                     ForEach(Filter.allCases) { Text($0.rawValue).tag($0) }
                 }
                 .pickerStyle(.segmented)
             } footer: {
-                Text("Up to \(DiagnosticEventLog.defaultLimit) events from the last two weeks. Warnings and errors are kept longer than routine entries. Filenames, photo identifiers, addresses and links are removed.")
+                Text("最多显示最近两周的 \(DiagnosticEventLog.defaultLimit) 条事件。警告和错误的保留时间比普通记录更长，文件名、照片标识、地址和链接已移除。")
             }
 
             Section {
                 if visible.isEmpty {
-                    Text(filter == .all ? "No events recorded yet." : "No warnings or errors.")
+                    Text(filter == .all ? "尚无事件记录。" : "没有警告或错误。")
                         .foregroundStyle(.secondary)
                 }
                 ForEach(Array(visible.enumerated()), id: \.offset) { _, event in
@@ -35,7 +35,7 @@ struct DiagnosticEventsView: View {
                 }
             }
         }
-        .navigationTitle("Event Timeline")
+        .navigationTitle("事件时间线")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
@@ -44,25 +44,25 @@ struct DiagnosticEventsView: View {
                         let formatter = ISO8601DateFormatter()
                         UIPasteboard.general.string = events.map { $0.line(formatter) }.joined(separator: "\n")
                     } label: {
-                        Label("Copy All", systemImage: "doc.on.doc")
+                        Label("全部复制", systemImage: "doc.on.doc")
                     }
                     Button(role: .destructive) {
                         confirmingClear = true
                     } label: {
-                        Label("Clear Timeline", systemImage: "trash")
+                        Label("清空时间线", systemImage: "trash")
                     }
                 } label: {
                     Image(systemName: "ellipsis.circle")
                 }
             }
         }
-        .confirmationDialog("Clear the event timeline?", isPresented: $confirmingClear, titleVisibility: .visible) {
-            Button("Clear Timeline", role: .destructive) {
+        .confirmationDialog("清空事件时间线？", isPresented: $confirmingClear, titleVisibility: .visible) {
+            Button("清空时间线", role: .destructive) {
                 DiagnosticEventLog.shared.clear()
                 reload()
             }
         } message: {
-            Text("A later diagnostic report will not be able to explain what happened before now.")
+            Text("清空后，新生成的诊断报告将无法解释之前发生的问题。")
         }
         .onAppear(perform: reload)
         .refreshable { reload() }
@@ -96,8 +96,8 @@ private struct DiagnosticEventRow: View {
                     .textSelection(.enabled)
                     .fixedSize(horizontal: false, vertical: true)
                 if event.occurrences > 1 {
-                    Text("Repeated \(event.occurrences) times"
-                         + (event.firstDate.map { " since \($0.formatted(date: .omitted, time: .shortened))" } ?? ""))
+                    Text("重复 \(event.occurrences) 次"
+                         + (event.firstDate.map { "，始于 \($0.formatted(date: .omitted, time: .shortened))" } ?? ""))
                         .font(.caption2).foregroundStyle(.secondary)
                 }
             }
@@ -142,7 +142,7 @@ struct AutomaticRunRow: View {
                     .textSelection(.enabled)
                     .fixedSize(horizontal: false, vertical: true)
             } else {
-                Text("Still running, or the app was stopped before it finished.")
+                Text("仍在运行，或应用在完成前已停止。")
                     .font(.caption).foregroundStyle(.orange)
             }
             if let context = run.context {
@@ -150,7 +150,7 @@ struct AutomaticRunRow: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
             if let duration = run.duration {
-                Text("Took \(AutomaticBackupCoordinator.describeInterval(duration))")
+                Text("耗时 \(AutomaticBackupCoordinator.describeInterval(duration))")
                     .font(.caption2).foregroundStyle(.secondary)
             }
         }

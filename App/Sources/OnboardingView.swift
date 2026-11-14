@@ -228,7 +228,7 @@ struct OnboardingView: View {
             VStack(spacing: 10) {
                 Button(preferences.selectedAlbumIDs.isEmpty ? "稍后选择" : "继续") { next() }
                     .buttonStyle(PrimaryButtonStyle())
-                Text("\(preferences.selectedAlbumIDs.count) selected")
+                Text("已选 \(preferences.selectedAlbumIDs.count) 个")
                     .font(.footnote).foregroundStyle(.secondary)
             }
             .padding(20)
@@ -354,8 +354,8 @@ struct OnboardingView: View {
     private var completionMessage: String {
         let count = preferences.selectedAlbumIDs.count
         return count == 0
-            ? "Your account is connected. You can choose albums from the Albums tab."
-            : "Your account is connected, and we’ll keep \(count) selected \(count == 1 ? "album" : "albums") protected."
+            ? "账号已连接。可以在“相簿”页面选择要备份的内容。"
+            : "账号已连接，将为您备份选中的 \(count) 个相簿。"
     }
 
     private func next() { withAnimation { step = min(pageCount - 1, step + 1) } }
@@ -450,8 +450,8 @@ struct AlbumSelectionRow: View {
     }
 
     private var detail: String {
-        guard let backedUpCount else { return "\(album.count.formatted()) items" }
-        if backedUpCount >= album.count, album.count > 0 { return "All \(album.count.formatted()) backed up" }
-        return "\(backedUpCount.formatted()) of \(album.count.formatted()) backed up"
+        guard let backedUpCount else { return "\(album.count.formatted()) 项" }
+        if backedUpCount >= album.count, album.count > 0 { return "全部 \(album.count.formatted()) 项已备份" }
+        return "已备份 \(backedUpCount.formatted()) / \(album.count.formatted()) 项"
     }
 }

@@ -157,7 +157,7 @@ struct DashboardView: View {
                         }
                         .buttonStyle(.bordered)
                         .tint(BackupTheme.blue)
-                        .accessibilityHint("Lets uploads in progress finish, then holds the remaining queue")
+                        .accessibilityHint("等待正在上传的任务完成，然后暂停剩余队列")
                     }
 
                     if !queue.isIdle {
@@ -193,7 +193,7 @@ struct DashboardView: View {
             && !isStartingManualRun && !queue.isUserPaused
         return Button(action: backUpSelectedAlbums) {
             quickActionLabel(symbol: "arrow.up.circle.fill",
-                             title: isStartingManualRun ? "Checking…" : "立即备份",
+                             title: isStartingManualRun ? "正在检查…" : "立即备份",
                              detail: backUpActionDetail,
                              isEnabled: enabled)
         }
@@ -204,8 +204,8 @@ struct DashboardView: View {
         if selectedAlbums.isEmpty { return "请先选择相簿" }
         if queue.isUserPaused { return "备份已暂停" }
         let backedUp = selectedBackedUpCount
-        guard selectedItemCount > 0 else { return "\(selectedItemCount.formatted()) items" }
-        return "\(backedUp.formatted()) of \(selectedItemCount.formatted()) backed up"
+        guard selectedItemCount > 0 else { return "\(selectedItemCount.formatted()) 项" }
+        return "已备份 \(backedUp.formatted()) / \(selectedItemCount.formatted()) 项"
     }
 
     /// Backed-up total for the selection, using the same "All Photos contains
@@ -260,7 +260,7 @@ struct DashboardView: View {
                     }
                 }
                 if selectedAlbums.count > 4 {
-                    Text("+ \(selectedAlbums.count - 4) more albums")
+                    Text("另有 \(selectedAlbums.count - 4) 个相簿")
                         .font(.footnote.weight(.semibold)).foregroundStyle(BackupTheme.blue)
                 }
             }
@@ -347,8 +347,8 @@ struct DashboardView: View {
     private var heroSubtitle: String {
         if !account.status.isUsable { return "请先连接账号" }
         if let reason = queue.pauseReason { return reason }
-        if !queue.isIdle { return "\(queue.activeCount) items remaining" }
-        if queue.failedCount > 0 { return "\(queue.failedCount) items failed — open Activity to retry" }
+        if !queue.isIdle { return "剩余 \(queue.activeCount) 项" }
+        if queue.failedCount > 0 { return "\(queue.failedCount) 项失败，请到“备份记录”中重试" }
         if selectedAlbums.isEmpty { return "选择需要备份的相簿" }
         return "所选相簿已全部备份"
     }
@@ -373,9 +373,9 @@ struct DashboardView: View {
 
     private func progressLabel(for album: PhotoAlbum) -> String {
         guard let backedUp = albums.backedUpCounts[album.id] else {
-            return "\(album.count.formatted()) items"
+            return "\(album.count.formatted()) 项"
         }
-        return "\(backedUp.formatted()) of \(album.count.formatted()) backed up"
+        return "已备份 \(backedUp.formatted()) / \(album.count.formatted()) 项"
     }
 
     private func refreshBackedUpCounts() {
@@ -399,8 +399,8 @@ struct DashboardView: View {
         case .noLibraryAccess: return "请在设置中允许访问照片，才能备份相簿。"
         case .noAlbumsSelected: return "请先到“相簿”页面选择相簿。"
         case .nothingToDo: return "所选相簿中的内容均已备份。"
-        case .started(let count): return "Backing up \(count.formatted()) items. Watch progress in Activity."
-        case .rechecking(let count): return "Re-checking \(count.formatted()) items against Google Photos."
+        case .started(let count): return "正在备份 \(count.formatted()) 项，可在“备份记录”中查看进度。"
+        case .rechecking(let count): return "正在与 Google 相册核对 \(count.formatted()) 项。"
         }
     }
 

@@ -168,14 +168,14 @@ struct UploadsView: View {
             HStack {
                 Text("上传任务")
                 Spacer()
-                if !queue.isIdle { Text("\(queue.activeCount) remaining") }
+                if !queue.isIdle { Text("剩余 \(queue.activeCount) 项") }
             }
         } footer: {
             let notes = [
-                listed.hiddenQueued > 0 ? "\(listed.hiddenQueued.formatted()) more waiting their turn." : nil,
-                listed.hiddenFinished > 0 ? "\(listed.hiddenFinished.formatted()) older finished items not shown." : nil,
+                listed.hiddenQueued > 0 ? "还有 \(listed.hiddenQueued.formatted()) 项正在排队。" : nil,
+                listed.hiddenFinished > 0 ? "另有 \(listed.hiddenFinished.formatted()) 项较早完成的记录未显示。" : nil,
                 queue.deferredForICloudCount > 0
-                    ? "\(queue.deferredForICloudCount) items need to download from iCloud first. Keep the app open to finish them."
+                    ? "有 \(queue.deferredForICloudCount) 项需先从 iCloud 下载。请保持应用打开。"
                     : nil,
             ].compactMap { $0 }
             if !notes.isEmpty { Text(notes.joined(separator: " ")) }

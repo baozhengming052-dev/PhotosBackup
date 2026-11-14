@@ -21,16 +21,16 @@ struct DiagnosticsView: View {
 
             Section {
                 if runs.isEmpty {
-                    Text("No backup run has been recorded yet.")
+                    Text("尚无备份任务记录。")
                         .foregroundStyle(.secondary)
                 } else {
                     ForEach(runs.prefix(12)) { run in AutomaticRunRow(run: run) }
                 }
-                NavigationLink("Event Timeline") { DiagnosticEventsView() }
+                NavigationLink("事件时间线") { DiagnosticEventsView() }
             } header: {
-                Text("Recent Runs")
+                Text("最近的运行记录")
             } footer: {
-                Text("Every run, newest first: opening the app, Back Up Now, Shortcuts, and the background windows iOS grants. A background run shows when iOS actually started it.")
+                Text("按时间从近到远显示每次运行：打开应用、立即备份、快捷指令和 iOS 允许的后台运行。后台记录会显示 iOS 实际启动时间。")
             }
 
 #if DEBUG
@@ -43,27 +43,27 @@ struct DiagnosticsView: View {
                         .foregroundStyle(.orange)
                         .fixedSize(horizontal: false, vertical: true)
                 } else {
-                    Label("Ready to run", systemImage: "checkmark.circle.fill")
+                    Label("可以运行", systemImage: "checkmark.circle.fill")
                         .font(.footnote)
                         .foregroundStyle(.green)
                 }
                 Button {
                     automaticBackup.simulateRun()
                 } label: {
-                    Label("Simulate Background Run", systemImage: "play.circle")
+                    Label("模拟后台运行", systemImage: "play.circle")
                 }
                 Text(automaticBackup.debugSimulationStatus)
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
-                Button("Copy LLDB Launch Command") {
+                Button("复制 LLDB 启动命令") {
                     UIPasteboard.general.string = AutomaticBackupCoordinator.lldbSimulationCommand
                 }
-                Button("Copy Log Stream Command") {
+                Button("复制日志流命令") {
                     UIPasteboard.general.string = AutomaticBackupCoordinator.logStreamCommand
                 }
             } header: {
-                Text("Background Debugging")
+                Text("后台调试")
             } footer: {
                 Text(AutomaticBackupCoordinator.lldbSimulationCommand)
                     .font(.caption2.monospaced())
@@ -79,7 +79,7 @@ struct DiagnosticsView: View {
                                 Text(failure.name).font(.caption.weight(.medium)).lineLimit(1)
                                 Spacer()
                                 if let code = failure.statusCode {
-                                    Text("code \(code)").font(.caption2.monospaced()).foregroundStyle(.secondary)
+                                    Text("代码 \(code)").font(.caption2.monospaced()).foregroundStyle(.secondary)
                                 }
                             }
                             Text(failure.reason)
@@ -90,30 +90,30 @@ struct DiagnosticsView: View {
                         }
                         .padding(.vertical, 2)
                     }
-                    Button("Copy All Failures") {
+                    Button("复制所有失败详情") {
                         UIPasteboard.general.string = queue.recentFailures
                             .map(\.summary)
                             .joined(separator: "\n")
                     }
                 } header: {
-                    Text("Upload Failures")
+                    Text("上传失败记录")
                 } footer: {
                     // The count is the part a bug report never has: one 400 and
                     // four hundred of them read identically on a cleared queue.
                     Text(queue.failureCount > queue.recentFailures.count
-                         ? "\(queue.failureCount) failures this session; showing the \(queue.recentFailures.count) most recent."
-                         : "\(queue.failureCount) failures this session.")
+                         ? "本次运行失败 \(queue.failureCount) 次，显示最近 \(queue.recentFailures.count) 次。"
+                         : "本次运行失败 \(queue.failureCount) 次。")
                 }
             }
 
-            Section("Connection Flow") {
+            Section("连接流程") {
                 Button { showingConnect = true } label: {
-                    Label("Connect Google Account", systemImage: "person.badge.key")
+                    Label("连接 Google 账号", systemImage: "person.badge.key")
                 }
-                if probe.running { HStack { ProgressView(); Text("Running exchange…").foregroundStyle(.secondary) } }
+                if probe.running { HStack { ProgressView(); Text("正在交换凭据…").foregroundStyle(.secondary) } }
             }
 
-            Section("Feasibility Checklist") {
+            Section("可行性检查清单") {
                 ForEach(log.steps) { item in
                     VStack(alignment: .leading, spacing: 3) {
                         HStack(spacing: 8) {
@@ -131,27 +131,27 @@ struct DiagnosticsView: View {
 
             if probe.lastResult != nil {
                 Section {
-                    Button("Re-run Read-only Check") { Task { await probe.rerunReadAccess() } }.disabled(probe.running)
+                    Button("重新运行只读检查") { Task { await probe.rerunReadAccess() } }.disabled(probe.running)
                 }
             }
 
             Section {
-                DisclosureGroup("Advanced: Paste oauth_token", isExpanded: $showAdvanced) {
-                    TextField("oauth_token value", text: $manualToken)
+                DisclosureGroup("高级：粘贴 oauth_token", isExpanded: $showAdvanced) {
+                    TextField("oauth_token 值", text: $manualToken)
                         .textInputAutocapitalization(.never).autocorrectionDisabled().font(.footnote.monospaced()).lineLimit(4)
-                    Button("Run Exchange") {
+                    Button("执行凭据交换") {
                         let token = manualToken.trimmingCharacters(in: .whitespacesAndNewlines)
                         guard !token.isEmpty else { return }
-                        log.set(ProbeLog.cookieRead, .skipped, "manual paste")
-                        log.set(ProbeLog.nativeHandoff, .skipped, "manual paste")
-                        log.set(ProbeLog.appIngest, .skipped, "manual paste")
+                        log.set(ProbeLog.cookieRead, .skipped, "手动粘贴")
+                        log.set(ProbeLog.nativeHandoff, .skipped, "手动粘贴")
+                        log.set(ProbeLog.appIngest, .skipped, "手动粘贴")
                         Task { await probe.runExchange(oauthToken: token) }
                     }
                     .disabled(manualToken.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || probe.running)
                 }
             }
         }
-        .navigationTitle("Diagnostics")
+        .navigationTitle("诊断")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear { runs = AutomaticBackupRunHistory.recent() }
         .fullScreenCover(isPresented: $showingConnect) {

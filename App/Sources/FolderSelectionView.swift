@@ -39,7 +39,7 @@ struct FolderSelectionView: View {
             .searchable(text: $searchText, prompt: "搜索相簿")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Text("\(preferences.selectedAlbumIDs.count) selected")
+                    Text("已选 \(preferences.selectedAlbumIDs.count) 个")
                         .font(.subheadline).foregroundStyle(.secondary)
                 }
             }
