@@ -45,14 +45,14 @@ extension BackupConnection {
     func decision(for status: BackupNetworkStatus) -> NetworkPolicyDecision {
         switch status {
         case .checking:
-            return NetworkPolicyDecision(allowsUploads: false, pauseReason: "Checking the network connection…")
+            return NetworkPolicyDecision(allowsUploads: false, pauseReason: "正在检查网络连接…")
         case .unavailable:
-            return NetworkPolicyDecision(allowsUploads: false, pauseReason: "Waiting for a network connection")
+            return NetworkPolicyDecision(allowsUploads: false, pauseReason: "等待网络连接")
         case .wifi, .wired:
             return .allowed
         case .cellular, .other:
             if self == .wifiAndCellular { return .allowed }
-            return NetworkPolicyDecision(allowsUploads: false, pauseReason: "Waiting for Wi-Fi")
+            return NetworkPolicyDecision(allowsUploads: false, pauseReason: "等待 Wi-Fi")
         }
     }
 }

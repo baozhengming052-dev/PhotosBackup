@@ -15,7 +15,7 @@ enum BackupShortcutBridge {
                 "Back Up Photos ran before the app finished starting, so nothing was done",
                 level: .warning
             )
-            return "Open Photos Backup once, then run this shortcut again."
+            return "请先打开一次照片备份应用，再重新运行该快捷指令。"
         }
         let summary = await coordinator.performShortcutBackup().summary
         return summary.prefix(1).uppercased() + summary.dropFirst()
@@ -29,9 +29,9 @@ enum BackupShortcutBridge {
 /// are all readable after the first unlock since restart.
 @available(iOS 16.0, *)
 struct BackUpPhotosIntent: AppIntent {
-    static let title: LocalizedStringResource = "Back Up Photos"
+    static let title: LocalizedStringResource = "备份照片"
     static let description = IntentDescription(
-        "Finds new photos and videos in the albums chosen in Photos Backup and starts uploading them to Google Photos. Uploads continue in the background after the action ends."
+        "查找照片备份中所选相簿的新照片和视频，并将其上传至 Google 相册。快捷指令结束后，上传仍可在后台继续。"
     )
     static let openAppWhenRun = false
     static let authenticationPolicy: IntentAuthenticationPolicy = .alwaysAllowed
@@ -51,7 +51,7 @@ struct PhotosBackupAppShortcuts: AppShortcutsProvider {
                 "Back up my photos with \(.applicationName)",
                 "Start \(.applicationName) backup"
             ],
-            shortTitle: "Back Up Photos",
+            shortTitle: "备份照片",
             systemImageName: "photo.badge.arrow.down"
         )
     }

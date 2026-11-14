@@ -137,7 +137,7 @@ struct SettingsView: View {
         } header: {
             Text("备份")
         } footer: {
-            Text("More simultaneous uploads finish a large backup sooner. Each one stages a full-size copy on the device while it runs, so high values use more storage, battery and data at once — 2 suits most phones. Lowering it lets uploads already running finish first.\n\nStorage Saver asks Google Photos to reduce file size. With Count Against Storage Quota off, uploads identify as an older Pixel phone so they don't use your Google storage; the Google Photos app may then label them “Storage saver” even though the original file was kept. The file size, or Google Photos on the web, shows the real quality.\n\nBack Up Live Photo Motion attaches each Live Photo's motion to its photo, so it plays as a Live Photo in Google Photos and the Google Photos app's Free up space can remove it from this iPhone. It uploads the short video too, a few MB per Live Photo, and uses storage the same way the photo does. Live Photos backed up earlier get their motion added in the background.")
+            Text("增加同时上传数量可以更快完成大量备份，但每个任务都会在设备上准备一份完整文件，因此也会增加存储空间、电量和流量消耗。多数手机建议设置为 2，降低数量时，正在上传的任务会先完成。\n\n“节省存储空间画质”会请求 Google 压缩文件。关闭“计入 Google 存储配额”后，上传时会模拟较旧的 Pixel 手机，尝试不计入 Google 空间。Google 相册可能仍将其显示为“节省存储空间画质”，即使保存的是原始文件。请以文件大小或网页版 Google 相册确认真实画质。\n\n开启“备份实况照片动态部分”后，将连同实况照片的短视频一并上传，使其能在 Google 相册中播放动态效果，也能被“释放空间”功能识别。此前只备份静态部分的实况照片，其动态部分也会在后台补传。")
         }
     }
 

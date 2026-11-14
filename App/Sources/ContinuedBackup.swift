@@ -58,7 +58,7 @@ struct ContinuedBackupProgress: Equatable {
     }
 
     func subtitle(waitingFor reason: String?) -> String {
-        reason ?? "\(completed.formatted()) of \(total.formatted()) done"
+        reason ?? "已完成 \(completed.formatted()) / \(total.formatted()) 项"
     }
 
     /// Units iOS sees per queue item, so a heartbeat can move the reported
@@ -93,7 +93,7 @@ struct ContinuedBackupProgress: Equatable {
 @available(iOS 26.0, *)
 @MainActor
 final class ContinuedBackupSession {
-    static let title = "Backing up to Google Photos"
+    static let title = "正在备份到 Google 相册"
 
     /// iOS ended the task early: cancelled in the Live Activity, or the system
     /// needed the resources. Runs before iOS is told the task is over, which
@@ -175,7 +175,7 @@ final class ContinuedBackupSession {
 
     /// End the task. Always as a success: the flag tells iOS what to do with
     /// the Live Activity, not whether the backup finished (Apple DTS, developer
-    /// forums thread 808756). False leaves a "Task Failed" card on screen until
+    /// forums thread 808756). False leaves a "任务失败" card on screen until
     /// iOS clears it, and unfinished work stays queued either way. When iOS
     /// itself ends the task, it shows that card before the app hears about it.
     func finish() {

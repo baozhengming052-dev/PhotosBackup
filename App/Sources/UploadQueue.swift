@@ -4,7 +4,7 @@ import SwiftUI
 struct UploadOptions: Equatable, Sendable {
     /// Upload against the account's storage quota rather than as a device backup.
     var useQuota = false
-    /// Ask Google to re-encode ("Storage saver") instead of keeping the original.
+    /// Ask Google to re-encode ("节省存储空间画质") instead of keeping the original.
     var storageSaver = false
     /// Background processing must never spend its short CPU window downloading
     /// a cloud-only PhotoKit resource. Foreground work may opt back in.
@@ -52,14 +52,14 @@ struct UploadItem: Identifiable, Equatable, Sendable {
         }
         var label: String {
             switch self {
-            case .queued: return "Waiting"
-            case .waitingToRetry(let attempt): return "Retrying (attempt \(attempt + 1))"
+            case .queued: return "等待上传"
+            case .waitingToRetry(let attempt): return "正在重试（第 \(attempt + 1) 次）"
             case .waitingForICloud: return "Will download from iCloud when you open the app"
-            case .exporting: return "Preparing"
-            case .hashing: return "Checking"
+            case .exporting: return "正在准备"
+            case .hashing: return "正在检查"
             case .checkingDuplicate: return "Looking for a copy"
-            case .uploading: return "Uploading"
-            case .finalizing: return "Finishing"
+            case .uploading: return "正在上传"
+            case .finalizing: return "正在完成"
             case .alreadyBackedUp: return "Already backed up"
             case .done: return "Backed up"
             // Only ever the user's own doing now, so it says so: "Cancelled"
@@ -371,7 +371,7 @@ final class UploadQueue: ObservableObject {
     var hasWorkableItems: Bool { counts.unfinished > counts.waitingForICloud }
     var pauseReason: String? {
         haltReason
-            ?? (isUserPaused ? "You paused backup. Tap Resume to continue." : nil)
+            ?? (isUserPaused ? "您已暂停备份。点击“继续”即可恢复。" : nil)
             ?? networkPauseReason
             ?? systemPauseReason
             ?? rateLimitPauseReason
@@ -898,7 +898,7 @@ final class UploadQueue: ObservableObject {
     /// transport cancels in-flight work and requeues it so no upload can leak
     /// onto cellular after Wi-Fi disappears.
     func setNetworkAccess(allowed: Bool, pauseReason: String? = nil) {
-        let nextReason = allowed ? nil : (pauseReason ?? "Waiting for an allowed connection")
+        let nextReason = allowed ? nil : (pauseReason ?? "等待符合设置的网络连接")
         guard networkPauseReason != nextReason else { return }
         networkPauseReason = nextReason
         DiagnosticEventLog.shared.record(
@@ -932,7 +932,7 @@ final class UploadQueue: ObservableObject {
     /// Called by the background-task expiration handler. Work remains queued
     /// for the next system execution window or foreground launch.
     func suspendForBackgroundExpiration() {
-        systemPauseReason = "Paused until iOS gives the app more time"
+        systemPauseReason = "等待 iOS 允许继续后台运行"
         setPreparationGuardArmed(false)
         DiagnosticEventLog.shared.record(
             "queue",
@@ -1157,7 +1157,7 @@ final class UploadQueue: ObservableObject {
                     persist()
                     scheduleRetry(id, after: min(30, pow(2, Double(attempt))))
                 } else {
-                    let interrupted = "Backing this item up kept being interrupted before it finished."
+                    let interrupted = "此项目的备份多次在完成前被中断。"
                     setState(.failed(reason: interrupted, retryable: true), at: index)
                     recordFailure(name: items[index].name, reason: interrupted, status: nil, stage: stage)
                     cleanCheckpoint(for: index)
@@ -1241,12 +1241,12 @@ final class UploadQueue: ObservableObject {
     private func halt(_ error: GPMCError) {
         guard haltReason == nil else { return }
         haltReason = error.message
-        recordFailure(name: "Backup stopped", reason: error.message, status: error.status)
+        recordFailure(name: "备份已停止", reason: error.message, status: error.status)
         DiagnosticEventLog.shared.record(
             "queue",
             error.kind == .storageFull
-                ? "Stopped the queue: the Google account is out of storage, so no other upload can succeed"
-                : "Stopped the queue: Google refused the credential, so no other upload can succeed until the account is connected again",
+                ? "已停止队列：Google 账号存储空间已满，无法继续上传。"
+                : "已停止队列：Google 拒绝登录凭据，请重新连接账号。",
             level: .error
         )
         cancelRunningForRequeue()
@@ -1275,11 +1275,11 @@ final class UploadQueue: ObservableObject {
     /// What a row was doing, for a sentence that says where a failure happened.
     static func stageDescription(_ state: UploadItem.State) -> String {
         switch state {
-        case .exporting: return "exporting it from Photos"
-        case .hashing: return "reading the file"
-        case .checkingDuplicate: return "asking Google for an existing copy"
+        case .exporting: return "从照片图库导出"
+        case .hashing: return "读取文件"
+        case .checkingDuplicate: return "检查 Google 上是否已有副本"
         case .uploading: return "uploading"
-        case .finalizing: return "finishing it in Google Photos"
+        case .finalizing: return "在 Google 相册中完成上传"
         default: return "starting"
         }
     }
@@ -1307,7 +1307,7 @@ final class UploadQueue: ObservableObject {
         rateLimitDelay = min(Self.rateLimitMaxDelay, rateLimitDelay * 2)
         let minutes = Int(delay / 60)
         rateLimitPauseReason = "Google asked the app to slow down. Backup continues in "
-            + (minutes <= 1 ? "a minute." : "\(minutes) minutes.")
+            + (minutes <= 1 ? "1 分钟后。" : "\(minutes) 分钟后。")
         DiagnosticEventLog.shared.record(
             "queue",
             "Google limited how many requests the app may make, so new work waits \(Int(delay)) s: \(reason)",
@@ -1484,7 +1484,7 @@ final class UploadQueue: ObservableObject {
     /// to stage, say — is the first thing every relaunch restarts, so the app
     /// closes again on every open and nothing else ever backs up.
     private func noteInterruptedPreparations(_ ids: Set<UUID>) {
-        let reason = "Photos Backup closed unexpectedly more than once while preparing this item, so it was skipped to let the rest of the backup continue. Retry it from here, and please send a diagnostic report."
+        let reason = "照片备份在准备此项目时多次异常退出，因此暂时跳过，以便继续备份其他内容。您可以在这里重试，并请提交诊断报告。"
         var movedToBack: [UploadItem] = []
         var skipped = 0
         for index in items.indices where ids.contains(items[index].id) && items[index].state == .queued {

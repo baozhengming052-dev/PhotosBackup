@@ -151,7 +151,7 @@ final class BackgroundKeepAlive: NSObject {
         guard mode == .audio else { return }
         switch type {
         case .began:
-            DiagnosticEventLog.shared.record("keepalive", "Another app took over audio; the keep-alive waits for it to finish")
+            DiagnosticEventLog.shared.record("keepalive", "其他应用正在占用音频，等待其结束后恢复后台运行")
         case .ended where options.contains(.shouldResume):
             resumeAudio(after: "the audio interruption ended")
         case .ended:
@@ -175,9 +175,9 @@ final class BackgroundKeepAlive: NSObject {
             observers.forEach(NotificationCenter.default.removeObserver)
             observers = []
             try startAudio()
-            DiagnosticEventLog.shared.record("keepalive", "Resumed the silent audio after \(reason)")
+            DiagnosticEventLog.shared.record("keepalive", "\(reason) 后已恢复静音音频")
         } catch {
-            let message = "Could not resume the silent audio after \(reason): \(error.localizedDescription)"
+            let message = "\(reason) 后无法恢复静音音频：\(error.localizedDescription)"
             stop()
             onLost?(message)
         }
@@ -261,9 +261,9 @@ enum KeepAliveError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .audioDidNotStart: return "iOS would not start the silent audio"
-        case .locationNotYetAllowed: return "location access has not been granted yet"
-        case .locationDenied: return "location access is off for this app in Settings"
+        case .audioDidNotStart: return "iOS 未允许播放静音音频"
+        case .locationNotYetAllowed: return "尚未授予定位权限"
+        case .locationDenied: return "已在设置中关闭此应用的定位权限"
         }
     }
 }

@@ -78,7 +78,7 @@ struct UploadsView: View {
 
     private func pausedSection(_ reason: String) -> some View {
         Section {
-            Label("Backup Paused", systemImage: "pause.circle.fill").foregroundStyle(.orange)
+            Label("备份已暂停", systemImage: "pause.circle.fill").foregroundStyle(.orange)
             Text(reason).font(.footnote).foregroundStyle(.secondary)
             if queue.haltReason != nil {
                 Button("继续备份") { queue.resume() }.disabled(!account.status.isUsable)
