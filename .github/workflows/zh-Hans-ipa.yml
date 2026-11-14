@@ -1,0 +1,39 @@
+name: build-simplified-chinese-ipa
+
+on:
+  push:
+    branches: [zh-Hans-only]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build Simplified Chinese IPA
+    runs-on: macos-15
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select Xcode
+        run: |
+          if [ ! -d "/Applications/Xcode_26.3.app" ]; then
+            echo "::error::Xcode 26.3 is not installed on this runner."
+            ls -d /Applications/Xcode*.app >&2 || true
+            exit 1
+          fi
+          echo "DEVELOPER_DIR=/Applications/Xcode_26.3.app/Contents/Developer" >> "$GITHUB_ENV"
+      - name: Install XcodeGen
+        run: brew install xcodegen
+      - name: Build unsigned IPA
+        run: Scripts/make-ipa.sh
+      - name: Verify IPA and checksum
+        run: shasum -a 256 build/PhotosBackup.ipa > build/PhotosBackup.ipa.sha256
+      - name: Save Chinese IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: PhotosBackup-zh-Hans-IPA
+          path: |
+            build/PhotosBackup.ipa
+            build/PhotosBackup.ipa.sha256
+          if-no-files-found: error
